@@ -234,3 +234,12 @@ models/
 
 # Local Jupyter notebook backups
 *.ipynb.bak
+
+# Local pipeline backups
+backups/
+
+# Local backup files
+*.bak
+
+# Automated pipeline execution logs
+logs/
