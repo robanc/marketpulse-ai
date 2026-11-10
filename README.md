@@ -111,7 +111,7 @@ Further details are provided in the Modeling, Trading Simulation, and Strategy A
 
 MarketPulse AI combines three complementary data sources to evaluate stock market behavior, macroeconomic conditions, and investor sentiment.
 
-## 2.1 Yahoo Finance â€” Equity Market Data
+## 2.1 Yahoo Finance — Equity Market Data
 
 Historical daily equity data is collected using the `yfinance` Python library.
 
@@ -125,7 +125,7 @@ The market dataset contains daily open, high, low, close, and trading volume obs
 
 These variables support the calculation of momentum, moving averages, volatility, technical indicators, and volume-based features.
 
-## 2.2 FRED â€” Macroeconomic Indicators
+## 2.2 FRED — Macroeconomic Indicators
 
 Macroeconomic data is obtained from the Federal Reserve Economic Data (FRED) platform.
 
@@ -139,7 +139,7 @@ Macroeconomic data is obtained from the Federal Reserve Economic Data (FRED) pla
 
 These indicators provide information about interest rates, inflation, monetary policy, and economic conditions.
 
-## 2.3 CNN Fear & Greed Index â€” Alternative Sentiment Data
+## 2.3 CNN Fear & Greed Index — Alternative Sentiment Data
 
 MarketPulse AI introduces the CNN Fear & Greed Index as an additional data source beyond Yahoo Finance and FRED.
 
@@ -147,8 +147,8 @@ The index summarizes broad investor sentiment on a scale from 0 to 100, where lo
 
 The dataset includes:
 
-- `fear_greed_index` â€” Numerical market sentiment score.
-- `value_classification` â€” Sentiment category.
+- `fear_greed_index` — Numerical market sentiment score.
+- `value_classification` — Sentiment category.
 
 This additional source allows MarketPulse AI to incorporate sentiment-based features alongside technical and macroeconomic indicators.
 
@@ -168,7 +168,7 @@ The dataset contains fewer than one million observations; therefore, MarketPulse
 
 MarketPulse AI generates 33 engineered features grouped into seven categories.
 
-### A. Price Momentum â€” 4 Features
+### A. Price Momentum — 4 Features
 
 | Feature | Description |
 |---|---|
@@ -177,7 +177,7 @@ MarketPulse AI generates 33 engineered features grouped into seven categories.
 | `return_10d` | Ten-trading-day stock return |
 | `return_20d` | Twenty-trading-day stock return |
 
-### B. Moving Averages â€” 6 Features
+### B. Moving Averages — 6 Features
 
 | Feature | Description |
 |---|---|
@@ -188,7 +188,7 @@ MarketPulse AI generates 33 engineered features grouped into seven categories.
 | `ema_12` | Twelve-day exponential moving average |
 | `ema_26` | Twenty-six-day exponential moving average |
 
-### C. Volatility â€” 4 Features
+### C. Volatility — 4 Features
 
 | Feature | Description |
 |---|---|
@@ -197,7 +197,7 @@ MarketPulse AI generates 33 engineered features grouped into seven categories.
 | `daily_range_pct` | Daily high-to-low price range expressed as a percentage |
 | `atr_14` | Fourteen-day Average True Range |
 
-### D. Technical Indicators â€” 6 Features
+### D. Technical Indicators — 6 Features
 
 | Feature | Description |
 |---|---|
@@ -208,7 +208,7 @@ MarketPulse AI generates 33 engineered features grouped into seven categories.
 | `bollinger_upper` | Upper Bollinger Band |
 | `bollinger_lower` | Lower Bollinger Band |
 
-### E. Trading Volume â€” 4 Features
+### E. Trading Volume — 4 Features
 
 | Feature | Description |
 |---|---|
@@ -217,7 +217,7 @@ MarketPulse AI generates 33 engineered features grouped into seven categories.
 | `relative_volume_20` | Trading volume relative to its twenty-day average |
 | `log_volume` | Logarithmic transformation of trading volume |
 
-### F. Macroeconomic Indicators â€” 5 Features
+### F. Macroeconomic Indicators — 5 Features
 
 | Feature | Description |
 |---|---|
@@ -227,7 +227,7 @@ MarketPulse AI generates 33 engineered features grouped into seven categories.
 | `fed_funds_change_20d` | Twenty-trading-day change in the federal funds rate |
 | `cpi_change_60d` | Sixty-trading-day percentage change in CPI |
 
-### G. Market Sentiment â€” 4 Features
+### G. Market Sentiment — 4 Features
 
 | Feature | Description |
 |---|---|
@@ -361,8 +361,8 @@ The future-price helper variable, `future_close_10d`, is removed from the traini
 
 The resulting datasets are saved as:
 
-- `data/marketpulse_features.parquet` â€” Complete engineered dataset.
-- `data/marketpulse_training.parquet` â€” Model-ready stock observations.
+- `data/marketpulse_features.parquet` — Complete engineered dataset.
+- `data/marketpulse_training.parquet` — Model-ready stock observations.
 
 ## 3.6 Chronological Data Splitting and Leakage Prevention
 
@@ -753,25 +753,25 @@ If a stage fails, execution stops and returns a nonzero exit code.
 
 ## 6.3 Pipeline Execution Modes
 
-**Cached mode â€” uses existing market data**
+**Cached mode — uses existing market data**
 
 ```powershell
 python .\src\run_pipeline.py --mode cached
 ```
 
-Runs stages 2â€“5 without downloading new market data.
+Runs stages 2–5 without downloading new market data.
 
-**Full mode â€” refreshes market data**
+**Full mode — refreshes market data**
 
 ```powershell
 python .\src\run_pipeline.py --mode full
 ```
 
-Runs stages 1â€“5, including external data collection.
+Runs stages 1–5, including external data collection.
 
 Full mode requires network access and has not yet been validated end to end through the orchestrator.
 
-**Dry-run mode â€” previews execution**
+**Dry-run mode — previews execution**
 
 ```powershell
 python .\src\run_pipeline.py --mode cached --dry-run
