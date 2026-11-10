@@ -2,12 +2,12 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# 
+#
 # # MarketPulse AI: Model Training and Evaluation
-# 
+#
 # ## Stock Markets Analytics Zoomcamp 2026
 # ### Capstone Project
-# 
+#
 # ### Objectives
 # 1. Load and verify the engineered training dataset.
 # 2. Define predictive features and prediction targets.
@@ -17,11 +17,11 @@
 # 6. Evaluate regression and classification performance.
 # 7. Compare models and select the best candidate.
 # 8. Save trained models for backtesting and deployment.
-# 
+#
 # ### Prediction Targets
 # - Regression: 10-trading-day forward return.
 # - Classification: Positive or non-positive 10-day return.
-# 
+#
 # ### Evaluation Rules
 # - No random train/test splitting.
 # - No future information in predictive features.
@@ -29,7 +29,7 @@
 # - Fit preprocessing using training data only.
 # - Keep the test period untouched until final evaluation.
 # - Audit historical macroeconomic data availability before interpreting backtest performance.
-# 
+#
 
 # In[2]:
 
@@ -1601,5 +1601,3 @@ assert loaded_predictions["signal"].sum() == 2088
 print("\nSaved model verification: PASSED")
 print("Saved predictions verification: PASSED")
 print("Notebook 03 artifacts ready for backtesting.")
-
-

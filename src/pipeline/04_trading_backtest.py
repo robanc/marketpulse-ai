@@ -2,14 +2,14 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# 
+#
 # # MarketPulse AI: Trading Strategy Backtest
-# 
+#
 # ## Stock Markets Analytics Zoomcamp 2026
 # ### Capstone Project
-# 
+#
 # ### Objectives
-# 
+#
 # 1. Load the trained Random Forest classifier and locked trading configuration.
 # 2. Load historical stock prices and saved test predictions.
 # 3. Generate trading signals using the locked 0.60 probability threshold.
@@ -20,9 +20,9 @@
 # 8. Compare portfolio performance against SPY.
 # 9. Calculate cumulative returns, Sharpe ratio, volatility, and maximum drawdown.
 # 10. Document strategy limitations and out-of-sample results.
-# 
+#
 # ### Locked Strategy
-# 
+#
 # - Model: Random Forest Classifier
 # - Features: 24 market-derived indicators
 # - Signal threshold: 0.60
@@ -31,16 +31,16 @@
 # - Trade execution: Next trading session
 # - Model selection: Completed using validation data
 # - Test period: July 16, 2025 – October 21, 2026
-# 
+#
 # ### Backtesting Principles
-# 
+#
 # - Do not retrain or retune the model using test results.
 # - Do not execute trades using unavailable future prices.
 # - Avoid overlapping or duplicate positions beyond portfolio limits.
 # - Include realistic transaction costs and slippage.
 # - Use consistent execution assumptions for the strategy and benchmark.
 # - Distinguish model prediction accuracy from realized portfolio returns.
-# 
+#
 
 # In[1]:
 
@@ -1707,9 +1707,9 @@ print("\nCell 15 data-quality verification: PASSED")
 print("Adjustment provenance verification: PENDING")
 
 
-# 
+#
 # ### OHLC Data Quality Verification
-# 
+#
 # - Total historical price records: 46,221
 # - Initial OHLC inconsistencies: 4
 # - Cause: Floating-point precision differences
@@ -1718,9 +1718,9 @@ print("Adjustment provenance verification: PENDING")
 # - Historical data modified: No
 # - Final numerical consistency check: PASSED
 # - Corporate-action adjustment verification: Pending
-# 
+#
 # **Conclusion:** No material OHLC data-quality issues were identified.
-# 
+#
 
 # In[17]:
 
@@ -2095,6 +2095,3 @@ print(
 
 print("\nSaved artifacts verification: PASSED")
 print("Notebook 04 artifacts ready for strategy analysis.")
-
-
-

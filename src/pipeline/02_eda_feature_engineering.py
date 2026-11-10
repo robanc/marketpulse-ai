@@ -2,21 +2,21 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# 
+#
 # # MarketPulse AI
 # ## Stock Markets Analytics Zoomcamp 2026 — Capstone Project
-# 
+#
 # ### Notebook 02: Exploratory Data Analysis and Feature Engineering
-# 
+#
 # **Objective:** Explore the merged market dataset and develop
 # predictive features for stock return forecasting and trading
 # strategy evaluation.
-# 
+#
 # ### Data Sources
 # 1. Yahoo Finance — Historical Stock Prices
 # 2. FRED — Macroeconomic Indicators
 # 3. Alternative.me — Crypto Fear & Greed Index
-# 
+#
 # ### Workflow
 # 1. Load and validate the merged dataset
 # 2. Exploratory Data Analysis (EDA)
@@ -25,19 +25,19 @@
 # 5. Define 10-trading-day forward return targets
 # 6. Validate feature quality and prevent data leakage
 # 7. Save the feature-engineered dataset
-# 
+#
 # ### Modeling Objective
 # Predict 10-trading-day forward stock returns and evaluate
 # whether predictions can support a profitable trading strategy
 # after transaction costs.
-# 
+#
 # ### Important Considerations
 # - Use chronological training and validation splits.
 # - Avoid future information in predictive features.
 # - Treat SPY as the benchmark, not a trading candidate.
 # - Validate economic indicator publication timing and revisions
 #   before final backtesting.
-# 
+#
 
 # In[1]:
 
@@ -1359,5 +1359,3 @@ verified_training = pd.read_parquet(training_path)
 
 print("\nVerified saved training shape:",
       verified_training.shape)
-
-

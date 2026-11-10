@@ -2,27 +2,27 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# 
+#
 # # MarketPulse AI
 # ## Stock Markets Analytics Zoomcamp 2026 — Capstone Project
-# 
+#
 # ### Notebook 01: Data Collection
-# 
+#
 # **Objective:** Collect historical stock market data and prepare
 # the foundation for an end-to-end machine learning trading strategy.
-# 
+#
 # ### Data Sources
 # 1. Yahoo Finance — Historical stock prices and trading volume
 # 2. FRED — Macroeconomic indicators
 # 3. Alternative Data API — Additional market signals
-# 
+#
 # ### Workflow
 # 1. Install and import dependencies
 # 2. Define stock universe and date range
 # 3. Download historical market data
 # 4. Inspect data quality and completeness
 # 5. Save datasets locally for further processing
-# 
+#
 
 # In[1]:
 
@@ -718,8 +718,3 @@ print("Missing values:", merged_check.isna().sum().sum())
 print("\nDate range:")
 print(merged_check["date"].min(),
       "to", merged_check["date"].max())
-
-
-
-
-

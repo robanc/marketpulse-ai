@@ -2,26 +2,26 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# 
+#
 # # MarketPulse AI — Strategy Analysis
-# 
+#
 # ## Stock Markets Analytics Zoomcamp 2026 — Capstone Project
-# 
+#
 # ### Objective
-# 
+#
 # Evaluate the out-of-sample performance of the MarketPulse AI trading strategy using the corrected backtest results.
-# 
+#
 # ### Analysis Scope
-# 
+#
 # 1. Load and verify backtest artifacts
 # 2. Analyze executed trades and return distribution
 # 3. Evaluate performance by ticker
 # 4. Analyze portfolio exposure and drawdowns
 # 5. Compare risk-adjusted performance against SPY
 # 6. Document methodological limitations and conclusions
-# 
+#
 # ### Strategy Configuration
-# 
+#
 # - Model: RandomForestClassifier
 # - Prediction horizon: 10 trading days
 # - Signal threshold: 0.60
@@ -29,9 +29,9 @@
 # - Fixed allocation per position: $10,000
 # - Initial capital: $100,000
 # - Backtest period: July 2025 – November 2026
-# 
+#
 # **Note:** All results are simulated and subject to the documented methodology limitations.
-# 
+#
 
 # In[1]:
 
@@ -1832,24 +1832,24 @@ print("\nCell 13 verification: PASSED")
 print("Strategy analysis artifacts saved successfully.")
 
 
-# 
+#
 # ## Final Strategy Analysis and Conclusions
-# 
+#
 # ### 1. Project Overview
-# 
+#
 # MarketPulse AI evaluates a machine-learning-based stock trading
 # strategy using historical market data, macroeconomic indicators,
 # and sentiment data.
-# 
+#
 # The selected Random Forest classifier predicts the direction
 # of stock returns over a 10-trading-day horizon.
-# 
+#
 # The trading strategy uses a fixed 0.60 probability threshold,
 # a maximum of 10 concurrent positions, and an initial portfolio
 # capital of $100,000.
-# 
+#
 # ### 2. Out-of-Sample Backtest Results
-# 
+#
 # | Metric | MarketPulse AI | SPY |
 # |---|---:|---:|
 # | Cumulative Return | 25.33% | 22.58% |
@@ -1857,48 +1857,48 @@ print("Strategy analysis artifacts saved successfully.")
 # | Annualized Volatility | 10.69% | 12.30% |
 # | Sharpe Ratio | 1.6768 | 1.3292 |
 # | Maximum Drawdown | -5.24% | -8.88% |
-# 
+#
 # The corrected simulation executed 299 trades and generated
 # $25,326.20 in net portfolio profit.
-# 
+#
 # ### 3. Trading Performance
-# 
+#
 # - Win rate: 51.84%
 # - Profit factor: 1.4213
 # - Average net trade return: 0.85%
 # - Profitable tickers: 17 of 19 traded
 # - Top 10 winning trades contributed 79.30% of net profit
-# 
+#
 # The strategy's profitability was sensitive to a relatively
 # small number of large winning trades.
-# 
+#
 # ### 4. Portfolio Risk and Exposure
-# 
+#
 # - Average invested capital: 78.91%
 # - Average open positions: 9.09
 # - Portfolio beta versus SPY: 0.5531
 # - Annualized tracking error: 9.91%
 # - Information ratio: 0.1590
-# 
+#
 # The strategy exhibited lower historical market sensitivity
 # than SPY, but its relative-return consistency was limited.
-# 
+#
 # ### 5. Machine Learning Model Evaluation
-# 
+#
 # - Test ROC AUC: 0.5125
 # - Model Brier score: 0.2510
 # - Retrospective constant-baseline Brier score: 0.2481
 # - Confidence-to-trade-return correlation: -0.0141
-# 
+#
 # The classifier showed weak out-of-sample discrimination,
 # and its predicted probabilities were less accurate than
 # the retrospective constant-probability baseline.
-# 
+#
 # Positive simulated portfolio returns therefore do not
 # establish reliable predictive ability.
-# 
+#
 # ### 6. Methodology Limitations
-# 
+#
 # 1. Adjusted OHLC prices were used as execution-price proxies.
 # 2. SPY benchmark transaction costs were not aligned.
 # 3. Fractional shares and fixed position allocations were assumed.
@@ -1909,31 +1909,30 @@ print("Strategy analysis artifacts saved successfully.")
 # 7. The analysis used one historical out-of-sample test period.
 # 8. Overlapping prediction horizons limit statistical independence.
 # 9. Trading profitability was concentrated in large winning trades.
-# 
+#
 # ### 7. Final Conclusion
-# 
+#
 # MarketPulse AI demonstrated positive simulated performance
 # and exceeded the SPY benchmark over the evaluation period.
-# 
+#
 # However, weak model discrimination, imperfect calibration,
 # profit concentration, and backtesting assumptions prevent
 # the results from establishing a robust or deployable
 # trading advantage.
-# 
+#
 # The project demonstrates an end-to-end financial machine
 # learning workflow, including data collection, feature
 # engineering, model evaluation, chronological backtesting,
 # risk analysis, and reproducible reporting.
-# 
+#
 # ### 8. Future Improvements
-# 
+#
 # Potential improvements include:
-# 
+#
 # - Point-in-time data validation
 # - More realistic execution and transaction-cost modeling
 # - Walk-forward validation across multiple market regimes
 # - Probability calibration using validation data
 # - Additional benchmark and strategy comparisons
 # - Paper-trading evaluation before any live deployment
-# 
-
+#

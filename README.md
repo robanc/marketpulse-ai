@@ -1375,6 +1375,8 @@ The project does not provide personalized financial advice, investment recommend
 All reported trading results are historical simulations.
 
 Past performance does not guarantee future results.
+
+
 ---
 
 # 11. References and Acknowledgments
@@ -1442,4 +1444,3 @@ References to external data providers, software libraries, and educational resou
 Their inclusion does not imply endorsement of MarketPulse AI or its simulated trading results.
 
 MarketPulse AI is an educational research project and does not provide financial advice or guarantees of investment performance.
-
