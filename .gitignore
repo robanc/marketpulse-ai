@@ -218,3 +218,19 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# MarketPulse AI - Generated artifacts
+data/
+models/
+*.joblib
+*.pkl
+*.parquet
+*.csv
+
+# MarketPulse AI - Track reproducible dashboard outputs
+!results/
+!results/**/*.parquet
+!results/**/*.csv
+
+# Local Jupyter notebook backups
+*.ipynb.bak

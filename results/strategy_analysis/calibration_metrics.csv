@@ -1,0 +1,9 @@
+Metric,Value
+Test Observations,6400.0
+Actual Positive Rate,0.54328125
+Average Predicted Probability,0.5709892617929685
+Model ROC AUC,0.5124561767564793
+Model Brier Score,0.25102921081358553
+Constant Baseline Brier Score,0.2481267333984375
+Model Log Loss,0.6956001952454927
+Constant Baseline Log Loss,0.6893959544397155

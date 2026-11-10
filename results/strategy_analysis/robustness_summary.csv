@@ -1,0 +1,12 @@
+Category,Metric,Value,Interpretation
+Portfolio,Executed Trades,299.0,299 simulated executions
+Portfolio,Cumulative Return (%),25.32620098136318,Positive simulated return
+Benchmark,SPY Cumulative Return (%),22.58350133850653,Benchmark comparison
+Trading,Win Rate (%),51.83946488294314,Slightly above 50%
+Trading,Profit Factor,1.4213052590956912,Profits exceeded losses
+Concentration,Top 10 Trades / Net Profit (%),79.30327281769239,High profit concentration
+Risk,Strategy Maximum Drawdown (%),-5.235707046129545,Smaller simulated drawdown than SPY
+Risk,Portfolio Beta,0.5530848877181825,Lower market sensitivity
+Model,Test ROC AUC,0.5124561767564793,Weak predictive discrimination
+Model,Model Brier Score,0.25102921081358553,Worse than constant baseline
+Model,Constant Baseline Brier Score,0.2481267333984375,Retrospective reference
