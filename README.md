@@ -739,6 +739,95 @@ Future work should evaluate additional strategies, more realistic execution pric
 
 ---
 
+## 5.11 Alternative Momentum Strategy and Three-Strategy Comparison
+
+To evaluate an independent, rule-based alternative to the Random Forest
+classifier, MarketPulse AI implements a ten-day positive-momentum strategy
+in `src/pipeline/06_momentum_backtest.py`.
+
+### Momentum signal and execution rules
+
+- Universe: the same 20 equities used in the Random Forest backtest; SPY
+  remains the market benchmark.
+- Signal: ten-session historical closing-price return greater than zero.
+- Ranking: eligible stocks are prioritized by descending ten-session momentum.
+- Entry: next trading session's opening price after signal generation.
+- Exit: opening price ten trading sessions after entry.
+- Initial capital: $100,000.
+- Position allocation: fixed $10,000 per trade, with fractional shares.
+- Portfolio capacity: at most ten simultaneous positions.
+- Risk controls: no overlapping positions in the same ticker, no entries
+  exceeding available cash, and explicit exit-before-entry processing.
+- Transaction costs: 0.05% slippage per side and zero commission.
+- Risk-free rate for Sharpe calculations: zero.
+
+The momentum strategy does not use Random Forest probabilities for its
+trading decisions. Both active strategies are evaluated on the same
+historical universe and valuation dates.
+
+### Momentum execution results
+
+The strategy generated 3,478 valid trade candidates and executed 320
+trades. The remaining candidates were rejected because of existing
+ticker positions or portfolio-capacity constraints.
+
+### Common-period performance comparison
+
+The common valuation period runs from July 16, 2025, through
+November 3, 2026, covering 329 daily portfolio valuations and 328
+daily return periods.
+
+| Metric | Random Forest | Momentum | SPY buy-and-hold |
+|---|---:|---:|---:|
+| Cumulative return | 25.33% | 18.23% | 22.58% |
+| CAGR | 18.96% | 13.75% | 16.95% |
+| Annualized volatility | 10.69% | 11.10% | 12.30% |
+| Sharpe ratio | 1.677 | 1.215 | 1.329 |
+| Maximum drawdown | -5.24% | -6.12% | -8.89% |
+| Positive trading days | 56.71% | 53.66% | 53.05% |
+
+The Random Forest strategy achieved the highest cumulative return
+and Sharpe ratio and the smallest maximum drawdown over this period.
+The momentum strategy produced a positive return but underperformed
+both Random Forest and SPY.
+
+### Valuation alignment and limitations
+
+Four momentum positions remained open on November 3 and were valued
+using that day's closing prices. Their scheduled exits occurred on
+November 4. Therefore, the common-period momentum return of 18.23%
+differs from the 17.98% return calculated after all 320 trades exited.
+
+Both active strategies use simplified execution assumptions, including
+fixed position sizes, fractional shares, adjusted OHLC price proxies,
+and no market-impact model. The SPY benchmark does not have fully
+matched transaction-cost assumptions.
+
+The historical results are research findings rather than evidence of
+reliable future profitability. Additional walk-forward validation,
+transaction-cost sensitivity analysis, and testing across market
+regimes remain necessary.
+
+### Reproducible artifacts
+
+- `src/pipeline/06_momentum_backtest.py`
+- `results/momentum_executed_trades.csv`
+- `results/momentum_daily_equity.parquet`
+- `results/momentum_performance_metrics.csv`
+- `results/marketpulse_three_strategy_comparison.csv`
+
+The alternative momentum script can be executed independently with:
+
+```powershell
+python "src/pipeline/06_momentum_backtest.py"
+```
+
+The existing five-stage automated pipeline remains unchanged; the
+momentum strategy is an additional, independently executable analysis.
+
+
+---
+
 # 6. Automation
 
 ## 6.1 Automated Pipeline Architecture
