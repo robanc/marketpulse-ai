@@ -1291,6 +1291,58 @@ print("\nDataset shape:", features_df.shape)
 # In[18]:
 
 
+
+# Cell 17A - Feature-to-Target Correlation Analysis
+
+# Use complete labeled stock observations, excluding SPY.
+correlation_df = features_df.loc[
+    model_ready_mask & (features_df["ticker"] != "SPY"),
+    feature_columns + ["target_return_10d"]
+].copy()
+
+feature_target_corr = (
+    correlation_df[feature_columns]
+    .corrwith(correlation_df["target_return_10d"])
+    .dropna()
+    .sort_values(ascending=False)
+)
+
+print("FEATURE CORRELATIONS WITH 10-DAY FORWARD RETURNS")
+print("-" * 55)
+
+print("\nTop 10 positive correlations:")
+print(feature_target_corr.head(10).round(4))
+
+print("\nTop 10 negative correlations:")
+print(feature_target_corr.tail(10).sort_values().round(4))
+
+plt.figure(figsize=(12, 10))
+sns.barplot(
+    x=feature_target_corr.values,
+    y=feature_target_corr.index,
+    color="steelblue"
+)
+plt.axvline(0, color="black", linewidth=1)
+plt.title("Engineered Feature Correlation with 10-Day Forward Return")
+plt.xlabel("Pearson Correlation")
+plt.ylabel("Engineered Feature")
+plt.tight_layout()
+plt.show()
+
+correlation_path = (
+    project_root / "results" / "feature_target_correlations.csv"
+)
+correlation_path.parent.mkdir(parents=True, exist_ok=True)
+
+feature_target_corr.rename("correlation").to_csv(
+    correlation_path,
+    header=True
+)
+
+print("\nSaved correlation analysis:", correlation_path)
+print("Number of features analyzed:", len(feature_target_corr))
+
+
 # Cell 18 - Prepare and Save Machine Learning Dataset
 
 from pathlib import Path
