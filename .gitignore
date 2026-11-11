@@ -243,3 +243,4 @@ backups/
 
 # Automated pipeline execution logs
 logs/
+backup_pre_pipeline_*/

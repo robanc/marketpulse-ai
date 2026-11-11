@@ -914,18 +914,21 @@ The `logs/` directory is excluded from Git.
 
 ## 6.6 Automation Validation
 
-The cached pipeline was successfully tested end to end in an isolated project copy.
+The cached pipeline was successfully executed end to end on November 11, 2026, using the existing local market datasets.
 
-The following stages completed with exit code 0:
+The orchestrator completed all five cached-mode stages:
 
-- Feature engineering
-- Model training
-- Trading backtest
-- Strategy analysis
+- Stage 02: Feature engineering
+- Stage 03: Model training
+- Stage 04: Random Forest trading backtest
+- Stage 05: Strategy analysis
+- Stage 06: Momentum trading backtest
 
-The updated six-stage pipeline passed dry-run validation in both cached and full modes. An end-to-end execution of the updated pipeline has not yet been verified.
+The run finished with the message `Pipeline completed.`
 
-The Windows scheduled task was previously registered and ready, but its first scheduled execution has not yet been verified.
+Both cached and full execution modes also passed orchestrator dry-run validation. Full-mode execution has not yet been tested end to end.
+
+The Windows scheduled task was previously registered and reported ready. Its first scheduled execution has not yet been verified.
 
 ## 6.7 Automation Limitations
 
@@ -1071,17 +1074,22 @@ These are historical simulation results, not guarantees of future performance.
 
 ## 7.8 Reproducibility Validation
 
-The cached pipeline was successfully executed in an isolated copy of the project.
+On November 11, 2026, the updated cached pipeline completed successfully in the primary project directory.
 
-The validation confirmed that:
+Before execution, the existing datasets, trained models, and results were backed up. All 34 backup files passed SHA-256 integrity verification.
 
-- Feature engineering completed.
-- Model training completed.
-- Trading backtesting completed.
-- Strategy analysis completed.
-- The orchestrator exited successfully.
+After pipeline execution, the regenerated daily equity curves were compared with the original backup artifacts using NumPy `allclose` with relative tolerance `1e-8` and absolute tolerance `1e-6`.
 
-This validates the cached processing workflow with the available local datasets.
+| Verification | Random Forest | Momentum |
+|---|---:|---:|
+| Valuation dates | 329 | 329 |
+| Final simulated equity | $125,326.20 | $118,233.38 |
+| Equity curve comparison | Passed | Passed |
+| Reproducibility verification | Passed | Passed |
+
+The Random Forest strategy reproduced a 25.33% cumulative simulated return. The momentum strategy reproduced an 18.23% cumulative simulated return.
+
+This confirms reproducibility of both strategy equity curves using the available local datasets and cached execution workflow.
 
 It does not establish that a fresh clone can reproduce every result without additional data preparation or that full-mode execution will succeed under all external data conditions.
 
