@@ -822,8 +822,8 @@ The alternative momentum script can be executed independently with:
 python "src/pipeline/06_momentum_backtest.py"
 ```
 
-The existing five-stage automated pipeline remains unchanged; the
-momentum strategy can run independently and is also integrated as Stage 6 of the automated pipeline.
+The momentum strategy can run independently and is integrated as Stage 6
+of the seven-stage automated pipeline. Stage 7 generates latest-date predictions.
 
 
 ---
@@ -832,62 +832,75 @@ momentum strategy can run independently and is also integrated as Stage 6 of the
 
 ## 6.1 Automated Pipeline Architecture
 
-MarketPulse AI provides an automated Python pipeline that executes six stages:
+MarketPulse AI provides a seven-stage Python research pipeline.
 
 | Stage | Script | Purpose |
 |---|---|---|
 | 1 | `01_data_collection.py` | Collect equity, macroeconomic, and sentiment data |
 | 2 | `02_eda_feature_engineering.py` | Clean data and generate engineered features |
-| 3 | `03_model_training.py` | Train models and generate predictions |
-| 4 | `04_trading_backtest.py` | Execute historical trading simulations |
-| 5 | `05_strategy_analysis.py` | Evaluate strategy performance and robustness |
-| 6 | `06_momentum_backtest.py` | Execute an independent momentum trading simulation |
+| 3 | `03_model_training.py` | Train models and evaluate historical predictions |
+| 4 | `04_trading_backtest.py` | Simulate Random Forest trading decisions |
+| 5 | `05_strategy_analysis.py` | Evaluate performance and robustness |
+| 6 | `06_momentum_backtest.py` | Simulate an independent momentum strategy |
+| 7 | `07_latest_predictions.py` | Generate latest-date predictions and candidate trading signals |
 
-The exported scripts are stored in `src/pipeline/`.
+Pipeline scripts are stored in `src/pipeline/`.
 
-## 6.2 Pipeline Orchestrator
+## 6.2 Pipeline Orchestrator and Master Notebook
 
-The orchestrator is located at `src/run_pipeline.py`.
+The orchestrator, `src/run_pipeline.py`, executes the scripts
+sequentially using Python subprocesses. A failed stage stops
+execution and returns a nonzero exit code.
 
-It executes the pipeline stages sequentially using Python subprocesses.
+The master notebook, `notebooks/00_run_full_workflow.ipynb`,
+provides a single entry point for reviewing the workflow.
 
-If a stage fails, execution stops and returns a nonzero exit code.
+It can launch the existing Python pipeline and display:
+
+- Latest available market-data prediction date
+- Predicted probabilities and candidate trading signals
+- Historical simulated Random Forest trades
+- Momentum strategy equity observations
+
+The notebook defaults to cached dry-run mode. Set
+`DRY_RUN = False` to execute the selected workflow.
 
 ## 6.3 Pipeline Execution Modes
 
-**Cached mode — uses existing market data**
+**Cached mode - reuse downloaded market data**
 
 ```powershell
 python .\src\run_pipeline.py --mode cached
 ```
 
-Runs stages 2-6 without downloading new market data.
+Runs Stages 02-07 without downloading external data.
+Feature engineering, model training, and simulations
+are still recomputed.
 
-**Full mode — refreshes market data**
+**Full mode - refresh market data**
 
 ```powershell
 python .\src\run_pipeline.py --mode full
 ```
 
-Runs stages 1-6, including external data collection.
+Runs Stages 01-07, including external data collection.
+Full-mode execution requires network access and has
+not yet been validated end to end.
 
-Full mode requires network access and has not yet been validated end to end through the orchestrator.
-
-**Dry-run mode — previews execution**
+**Dry-run mode - preview execution**
 
 ```powershell
 python .\src\run_pipeline.py --mode cached --dry-run
 ```
 
-Displays the stages that would execute without running them.
+Displays the execution sequence without running stages.
 
 ## 6.4 Windows Task Scheduler
 
-MarketPulse AI includes a Windows PowerShell launcher:
+MarketPulse AI includes the PowerShell launcher
+`scripts/run_marketpulse.ps1`.
 
-`scripts/run_marketpulse.ps1`
-
-A local Windows scheduled task has been registered with the following configuration:
+A local Windows scheduled task has been registered:
 
 | Setting | Value |
 |---|---|
@@ -898,48 +911,62 @@ A local Windows scheduled task has been registered with the following configurat
 | Maximum execution time | 3 hours |
 | Missed-run handling | Start when available |
 
-The task uses the Windows interactive user account and requires an available signed-in session.
+The task uses the Windows interactive user account
+and requires an available signed-in session.
 
-The `scripts/setup_schedule.ps1` file prepares and previews the schedule configuration but does not currently register the task.
+`scripts/setup_schedule.ps1` previews the schedule
+configuration but does not currently register the task.
 
 ## 6.5 Logging and Error Handling
 
-The PowerShell launcher executes the pipeline using the project virtual environment.
+The PowerShell launcher uses the project virtual
+environment and sets the Matplotlib backend to `Agg`.
 
-It sets the Matplotlib backend to `Agg` to prevent interactive plot windows from interrupting automated execution.
+Execution output is written to timestamped files
+under `logs/`, which is excluded from Git.
 
-Execution output is written to timestamped log files in `logs/`.
-
-The `logs/` directory is excluded from Git.
+The Python orchestrator stops on failed subprocesses.
 
 ## 6.6 Automation Validation
 
-The cached pipeline was successfully executed end to end on November 11, 2026, using the existing local market datasets.
+On November 11, 2026, the updated cached pipeline
+successfully executed Stages 02-07 in the primary
+project directory.
 
-The orchestrator completed all five cached-mode stages:
+The run completed with:
 
-- Stage 02: Feature engineering
-- Stage 03: Model training
-- Stage 04: Random Forest trading backtest
-- Stage 05: Strategy analysis
-- Stage 06: Momentum trading backtest
+- All six cached-mode stages executed successfully
+- Latest inference generated for November 4, 2026
+- Twenty stocks evaluated
+- Seven candidate trading signals identified
+- Pipeline exit code 0
 
-The run finished with the message `Pipeline completed.`
+The latest prediction output is stored at
+`results/marketpulse_latest_predictions.csv`.
 
-Both cached and full execution modes also passed orchestrator dry-run validation. Full-mode execution has not yet been tested end to end.
+The selected research signals were CAT, WMT, BAC,
+COST, GS, GOOGL, and NVDA, using the locked
+0.60 probability threshold.
 
-The Windows scheduled task was previously registered and reported ready. Its first scheduled execution has not yet been verified.
+The master notebook was separately validated by
+executing all six code cells in cached dry-run mode.
+
+Both cached and full orchestrator dry runs passed.
+Full-mode execution has not yet been tested end to end.
+
+The Windows scheduled task was previously registered
+and reported ready; its first scheduled execution
+has not yet been verified.
 
 ## 6.7 Automation Limitations
 
-The current automation has the following limitations:
-
 - Weekly cached execution does not download fresh market data.
-- Full-mode execution has not yet been tested end to end.
-- Incremental data ingestion has not been implemented.
-- Windows scheduling depends on computer and user-session availability.
+- Cached mode recomputes transformations and models.
+- Full-mode execution has not yet been validated end to end.
+- Incremental ingestion and persistent checkpoints are not implemented.
+- Scheduling depends on computer and user-session availability.
 - Automated notifications and cloud scheduling are not implemented.
-
+- Latest-date signals are research outputs, not broker orders.
 
 ---
 
@@ -1199,9 +1226,9 @@ They do not establish that the strategy will remain profitable in future markets
 
 ## 8.6 Automated Research Workflow
 
-MarketPulse AI extends the notebook-based research process with five exported Python pipeline scripts and a centralized orchestrator.
+MarketPulse AI extends the notebook-based research process with seven Python pipeline scripts, a centralized orchestrator, and a master workflow notebook.
 
-The cached workflow has been validated end to end in an isolated project copy.
+The cached workflow was validated in an isolated project copy and subsequently executed successfully in the primary project directory on November 11, 2026.
 
 A Windows scheduled task is configured to execute the cached pipeline weekly.
 

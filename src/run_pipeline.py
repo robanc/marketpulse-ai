@@ -15,6 +15,7 @@ PIPELINE_STEPS = [
     "04_trading_backtest.py",
     "05_strategy_analysis.py",
     "06_momentum_backtest.py",
+    "07_latest_predictions.py",
 ]
 
 
