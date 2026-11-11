@@ -1,4 +1,4 @@
-﻿"""
+"""
 MarketPulse AI - Alternative 10-Day Momentum Strategy
 
 Independent trading strategy for Criterion 5.
@@ -468,7 +468,7 @@ for metric, value in momentum_metrics.items():
 
 assert years > 0
 assert daily_returns.std(ddof=1) > 0
-assert len(daily_returns) == 328
+assert len(daily_returns) == len(momentum_daily) - 1
 assert np.isfinite(
     list(momentum_metrics.values())
 ).all()
@@ -498,8 +498,8 @@ saved_trades = pd.read_csv(trades_output)
 saved_equity = pd.read_parquet(equity_output)
 saved_metrics = pd.read_csv(metrics_output)
 
-assert len(saved_trades) == 320
-assert len(saved_equity) == 329
+assert len(saved_trades) == len(momentum_executed_df)
+assert len(saved_equity) == len(momentum_daily)
 assert len(saved_metrics) == len(momentum_metrics)
 assert np.isclose(
     saved_equity["equity"].iloc[-1],

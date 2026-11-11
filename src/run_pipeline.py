@@ -1,4 +1,4 @@
-﻿"""MarketPulse AI pipeline orchestrator."""
+"""MarketPulse AI pipeline orchestrator."""
 
 import argparse
 import os
@@ -14,6 +14,7 @@ PIPELINE_STEPS = [
     "03_model_training.py",
     "04_trading_backtest.py",
     "05_strategy_analysis.py",
+    "06_momentum_backtest.py",
 ]
 
 

@@ -823,7 +823,7 @@ python "src/pipeline/06_momentum_backtest.py"
 ```
 
 The existing five-stage automated pipeline remains unchanged; the
-momentum strategy is an additional, independently executable analysis.
+momentum strategy can run independently and is also integrated as Stage 6 of the automated pipeline.
 
 
 ---
@@ -832,7 +832,7 @@ momentum strategy is an additional, independently executable analysis.
 
 ## 6.1 Automated Pipeline Architecture
 
-MarketPulse AI provides an automated Python pipeline that executes five stages:
+MarketPulse AI provides an automated Python pipeline that executes six stages:
 
 | Stage | Script | Purpose |
 |---|---|---|
@@ -841,6 +841,7 @@ MarketPulse AI provides an automated Python pipeline that executes five stages:
 | 3 | `03_model_training.py` | Train models and generate predictions |
 | 4 | `04_trading_backtest.py` | Execute historical trading simulations |
 | 5 | `05_strategy_analysis.py` | Evaluate strategy performance and robustness |
+| 6 | `06_momentum_backtest.py` | Execute an independent momentum trading simulation |
 
 The exported scripts are stored in `src/pipeline/`.
 
@@ -860,7 +861,7 @@ If a stage fails, execution stops and returns a nonzero exit code.
 python .\src\run_pipeline.py --mode cached
 ```
 
-Runs stages 2–5 without downloading new market data.
+Runs stages 2-6 without downloading new market data.
 
 **Full mode — refreshes market data**
 
@@ -868,7 +869,7 @@ Runs stages 2–5 without downloading new market data.
 python .\src\run_pipeline.py --mode full
 ```
 
-Runs stages 1–5, including external data collection.
+Runs stages 1-6, including external data collection.
 
 Full mode requires network access and has not yet been validated end to end through the orchestrator.
 
@@ -922,7 +923,9 @@ The following stages completed with exit code 0:
 - Trading backtest
 - Strategy analysis
 
-The Windows scheduled task is registered and ready, but its first scheduled execution has not yet occurred.
+The updated six-stage pipeline passed dry-run validation in both cached and full modes. An end-to-end execution of the updated pipeline has not yet been verified.
+
+The Windows scheduled task was previously registered and ready, but its first scheduled execution has not yet been verified.
 
 ## 6.7 Automation Limitations
 
