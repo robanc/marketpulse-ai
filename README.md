@@ -907,7 +907,7 @@ A local Windows scheduled task has been registered:
 | Task name | `MarketPulseAI-Weekly` |
 | Frequency | Every Sunday |
 | Time | 6:00 PM Central Time |
-| Pipeline mode | Cached |
+| Pipeline mode | Incremental |
 | Maximum execution time | 3 hours |
 | Missed-run handling | Start when available |
 
@@ -960,13 +960,134 @@ has not yet been verified.
 
 ## 6.7 Automation Limitations
 
-- Weekly cached execution does not download fresh market data.
+- Weekly incremental execution refreshes available market data without retraining the model.
 - Cached mode recomputes transformations and models.
 - Full-mode execution has not yet been validated end to end.
-- Incremental ingestion and persistent checkpoints are not implemented.
+- Incremental ingestion and SHA-256 recovery checkpoints are implemented and locally validated.
 - Scheduling depends on computer and user-session availability.
 - Automated notifications and cloud scheduling are not implemented.
 - Latest-date signals are research outputs, not broker orders.
+
+---
+
+## 6.8 Incremental Pipeline and Weekly Automation (November 12, 2026)
+
+MarketPulse AI now supports incremental market-data updates without
+retraining the existing machine learning model on every scheduled run.
+
+### Incremental execution
+
+Run the pipeline from the project root:
+
+```powershell
+python .\src\run_pipeline.py --mode incremental
+```
+
+Preview the execution without modifying datasets:
+
+```powershell
+python .\src\run_pipeline.py --mode incremental --dry-run
+```
+
+The incremental workflow executes six stages:
+
+| Stage | Script | Purpose |
+|---|---|---|
+| 1 | `08_incremental_stock_prices.py` | Append new Yahoo Finance equity observations |
+| 2 | `09_incremental_fred_macro.py` | Update aligned FRED macroeconomic observations |
+| 3 | `10_incremental_sentiment.py` | Update the sentiment proxy |
+| 4 | `11_incremental_merge.py` | Merge updated market datasets |
+| 5 | `12_incremental_features.py` | Refresh engineered features and training data |
+| 6 | `07_latest_predictions.py` | Generate latest model probabilities and research signals |
+
+The incremental workflow uses the existing trained model and does not
+automatically retrain it.
+
+### Data sources and limitations
+
+- Equity prices: Yahoo Finance, through yfinance.
+- Macroeconomic data: Federal Reserve Economic Data (FRED).
+- Incremental sentiment: Alternative.me Crypto Fear & Greed Index,
+  used as a proxy rather than CNN's equity Fear & Greed Index.
+- FRED availability alignment uses heuristic publication delays,
+  not independently verified point-in-time release timestamps.
+- CPI and unemployment values may be held at previously stored
+  values when publication timing is unverified.
+- Historical adjusted-price revisions can create discontinuities
+  when previously stored observations are retained.
+- Source revisions and feature availability require additional
+  validation before relying on the data for live trading decisions.
+
+Earlier README references to CNN sentiment describe the original
+research workflow and should not be interpreted as the source used
+by the incremental sentiment updater.
+
+### Recovery checkpoints
+
+Before an incremental run, the orchestrator creates a recovery
+checkpoint under `data/pipeline_checkpoints/`.
+
+The checkpoint contains copies of seven protected output files,
+with SHA-256 hashes recorded in a manifest.
+
+If a pipeline stage raises an error, the orchestrator attempts
+to restore those protected files from the checkpoint.
+
+Checkpoint hashes and simulated rollback behavior were validated
+on November 12, 2026.
+
+Recovery is file-based and is not a fully atomic transaction.
+Sudden power loss or hardware failure may still require manual
+recovery. Checkpoints and logs remain local and are excluded from Git.
+
+### Windows Task Scheduler
+
+The local Windows task `MarketPulseAI-Weekly` is enabled.
+
+| Setting | Value |
+|---|---|
+| Schedule | Every Sunday at 6:00 PM Central |
+| First scheduled run | November 15, 2026 |
+| Pipeline mode | Incremental |
+| Launcher | `scripts/run_marketpulse.ps1` |
+| Logging | Timestamped files under `logs/` |
+| Concurrent runs | Protected by a named Windows mutex |
+| Execution account | Interactive Windows user session |
+
+The computer must be awake, connected to power, and the configured
+Windows user session must be signed in.
+
+The scheduled task has been enabled, but its first scheduled
+execution has not yet been independently verified.
+
+### November 12 live validation
+
+The first live incremental execution completed successfully:
+
+- All six incremental stages completed.
+- Twenty-one equity symbols were updated, including SPY.
+- Updated market data reached November 12, 2026.
+- Twenty stocks received latest-date predictions.
+- Eight research signals exceeded the configured 0.60 threshold.
+- The seven-file recovery checkpoint passed SHA-256 verification.
+- Training data passed post-run missing-value checks.
+
+Initial rolling-window features and the most recent forward-looking
+training labels may legitimately contain missing values outside
+the eligible training rows.
+
+The successful run validates the local incremental workflow, not
+future scheduled execution reliability or investment profitability.
+
+### Research-only use
+
+MarketPulse AI produces research signals, not brokerage orders.
+
+Historical simulations and generated predictions do not establish
+a reliable trading advantage. Additional walk-forward validation,
+point-in-time data verification, monitoring, and execution modeling
+remain necessary before any live-trading use.
+
 
 ---
 
@@ -1128,7 +1249,7 @@ Reproducibility is subject to several constraints:
 - External APIs and data services may change or become unavailable.
 - The repository does not include the ignored local datasets.
 - Full-mode automation has not yet been validated end to end.
-- Incremental ingestion and persistent pipeline checkpoints are not implemented.
+- Incremental ingestion and persistent recovery checkpoints were validated on November 12, 2026.
 - Historical simulations use assumptions that may differ from live market execution.
 
 
@@ -1230,7 +1351,7 @@ MarketPulse AI extends the notebook-based research process with seven Python pip
 
 The cached workflow was validated in an isolated project copy and subsequently executed successfully in the primary project directory on November 11, 2026.
 
-A Windows scheduled task is configured to execute the cached pipeline weekly.
+An enabled Windows scheduled task is configured to execute the incremental pipeline every Sunday at 6:00 PM Central.
 
 Automation architecture and scheduling details are documented in Section 6, while reproduction instructions are provided in Section 7.
 
@@ -1239,7 +1360,7 @@ Automation architecture and scheduling details are documented in Section 6, whil
 Potential improvements include:
 
 - Validating the complete fresh-data pipeline.
-- Implementing incremental market data ingestion.
+- Improving incremental data-source validation and monitoring.
 - Adding automated pipeline health notifications.
 - Supporting cloud-based scheduled execution.
 - Expanding model monitoring and drift detection.
@@ -1470,7 +1591,7 @@ Operational limitations include:
 
 - Cached runs do not automatically refresh external market data.
 - Full-mode execution has not yet been validated end to end.
-- Incremental ingestion and checkpoint recovery are not implemented.
+- Incremental ingestion and checkpoint recovery are implemented; scheduled execution and power-loss recovery remain to be verified.
 - Scheduled execution depends on local computer and Windows session availability.
 - Automated alerting and cloud-based monitoring are not implemented.
 
