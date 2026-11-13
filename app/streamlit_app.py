@@ -566,6 +566,41 @@ st.caption(
 st.divider()
 st.header("Operational Monitoring")
 
+# Published monitoring snapshot for environments without local datasets.
+monitoring_snapshot = None
+snapshot_path = (
+    PROJECT_ROOT / "results" / "monitoring" / "monitoring_snapshot.json"
+)
+
+if snapshot_path.exists():
+    try:
+        import json
+
+        with snapshot_path.open(encoding="utf-8") as snapshot_file:
+            candidate = json.load(snapshot_file)
+
+        if (
+            isinstance(candidate, dict)
+            and isinstance(candidate.get("data_freshness"), list)
+            and isinstance(candidate.get("pipeline"), dict)
+            and candidate.get("generated_at_utc")
+        ):
+            monitoring_snapshot = candidate
+            snapshot_time = pd.Timestamp(
+                candidate["generated_at_utc"]
+            ).tz_convert("America/Chicago")
+
+            st.caption(
+                "Published monitoring snapshot generated: "
+                + snapshot_time.strftime("%Y-%m-%d %I:%M:%S %p %Z")
+                + " | Static export, not live monitoring"
+            )
+        else:
+            st.warning("Published monitoring snapshot has an invalid structure.")
+
+    except (OSError, ValueError, TypeError, KeyError) as exc:
+        st.warning(f"Unable to load published monitoring snapshot: {exc}")
+
 
 st.subheader("Data Freshness Monitoring")
 
@@ -608,12 +643,47 @@ for source_name, filename in data_sources.items():
         except (OSError, ValueError, KeyError) as exc:
             st.warning(f"Unable to inspect {source_name}: {exc}")
     else:
-        freshness_records.append({
-            "Dataset": source_name,
-            "Records": None,
-            "Latest Observation": "Unavailable",
-            "File Updated (Central)": "Unavailable",
-        })
+        snapshot_record = None
+
+        if monitoring_snapshot is not None:
+            snapshot_record = next(
+                (
+                    item
+                    for item in monitoring_snapshot["data_freshness"]
+                    if isinstance(item, dict)
+                    and item.get("dataset") == source_name
+                ),
+                None,
+            )
+
+        if snapshot_record is not None:
+            updated = snapshot_record.get("file_updated_utc")
+            try:
+                updated_display = (
+                    pd.Timestamp(updated)
+                    .tz_convert("America/Chicago")
+                    .strftime("%Y-%m-%d %I:%M:%S %p %Z")
+                    if updated else "Unavailable"
+                )
+            except (ValueError, TypeError):
+                updated_display = "Unavailable"
+
+            freshness_records.append({
+                "Dataset": source_name,
+                "Records": snapshot_record.get("records"),
+                "Latest Observation": (
+                    snapshot_record.get("latest_observation")
+                    or "Unavailable"
+                ),
+                "File Updated (Central)": updated_display,
+            })
+        else:
+            freshness_records.append({
+                "Dataset": source_name,
+                "Records": None,
+                "Latest Observation": "Unavailable",
+                "File Updated (Central)": "Unavailable",
+            })
 
 st.dataframe(
     pd.DataFrame(freshness_records),
@@ -710,8 +780,60 @@ if history_path.exists():
     except (ValueError, KeyError, OSError) as exc:
         st.error(f"Unable to load monitoring history: {exc}")
 else:
-    st.info(
-        "Local pipeline execution history is not available "
-        "in this environment. Streamlit Cloud does not "
-        "automatically synchronize Windows pipeline logs."
-    )
+    if monitoring_snapshot is not None:
+        pipeline_summary = monitoring_snapshot["pipeline"]
+
+        st.caption(
+            "Pipeline execution summary | Published static snapshot"
+        )
+
+        col1, col2, col3 = st.columns(3)
+
+        col1.metric(
+            "Production Executions",
+            pipeline_summary.get("production_executions", 0),
+        )
+        col2.metric(
+            "Production Successes",
+            pipeline_summary.get("production_successes", 0),
+        )
+        col3.metric(
+            "Production Failures",
+            pipeline_summary.get("production_failures", 0),
+        )
+
+        latest_execution = pipeline_summary.get(
+            "latest_production_execution"
+        )
+
+        if latest_execution:
+            st.subheader("Latest Production Pipeline Execution")
+            st.dataframe(
+                pd.DataFrame([latest_execution]),
+                use_container_width=True,
+                hide_index=True,
+            )
+        else:
+            st.info(
+                "No production pipeline executions were recorded "
+                "when this snapshot was generated."
+            )
+
+        test_count = pipeline_summary.get("test_executions", 0)
+        if test_count:
+            st.caption(
+                f"{test_count} simulated monitoring test executions "
+                "are excluded from production metrics."
+            )
+
+        st.info(
+            "This is a published monitoring snapshot, not live "
+            "pipeline execution history. Local Windows logs "
+            "are not automatically synchronized to Streamlit Cloud."
+        )
+    else:
+        st.info(
+            "Local pipeline execution history is not available "
+            "in this environment, and no published monitoring "
+            "snapshot was found."
+        )

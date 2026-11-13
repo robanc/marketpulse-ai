@@ -1,0 +1,31 @@
+{
+  "generated_at_utc": "2026-11-13T21:08:04.880403+00:00",
+  "snapshot_type": "local_export",
+  "data_freshness": [
+    {
+      "dataset": "Stock Prices",
+      "records": 46809,
+      "latest_observation": "2026-11-12",
+      "file_updated_utc": "2026-11-12T21:34:00.968215+00:00"
+    },
+    {
+      "dataset": "FRED Macroeconomic",
+      "records": 2209,
+      "latest_observation": "2026-11-12",
+      "file_updated_utc": "2026-11-12T21:34:03.909450+00:00"
+    },
+    {
+      "dataset": "Market Sentiment",
+      "records": 2207,
+      "latest_observation": "2026-11-12",
+      "file_updated_utc": "2026-11-12T21:34:05.228363+00:00"
+    }
+  ],
+  "pipeline": {
+    "production_executions": 0,
+    "production_successes": 0,
+    "production_failures": 0,
+    "latest_production_execution": null,
+    "test_executions": 2
+  }
+}
