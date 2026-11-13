@@ -9,7 +9,7 @@
 4. [Modeling](#4-modeling)
 5. [Trading Simulation](#5-trading-simulation)
 6. [Automation](#6-automation)
-7. [Docker Containerization](#7-docker-containerization)
+7. [Docker Containerization and Cloud Deployment](#7-docker-containerization-and-cloud-deployment)
 8. [Reproducibility](#8-reproducibility)
 9. [Advanced Features and Enhancements](#9-advanced-features-and-enhancements)
 10. [Results and Key Findings](#10-results-and-key-findings)
@@ -1092,7 +1092,7 @@ remain necessary before any live-trading use.
 
 ---
 
-# 7. Docker Containerization
+# 7. Docker Containerization and Cloud Deployment
 
 MarketPulse AI provides a Dockerized Streamlit dashboard for
 reproducible visualization of historical backtesting results.
@@ -1148,6 +1148,49 @@ the incremental data collection pipeline.
 
 All displayed trading results are historical simulations
 intended for educational research.
+
+---
+
+## 7.7 Streamlit Community Cloud Deployment
+
+MarketPulse AI is publicly deployed on Streamlit Community Cloud.
+
+**Live dashboard:** https://marketpulse-ai-robanc.streamlit.app/
+
+### Deployment Configuration
+
+| Setting | Value |
+|---|---|
+| Repository | `robanc/marketpulse-ai` |
+| Branch | `main` |
+| Main file | `app/streamlit_app.py` |
+| Python version | 3.12 |
+| Dependencies | `app/requirements.txt` |
+
+### Cloud Deployment Procedure
+
+1. Sign in to https://share.streamlit.io/ using GitHub.
+2. Select **Create app** and deploy a public app from GitHub.
+3. Enter the repository, branch, and main file path above.
+4. Select Python 3.12 in Advanced settings.
+5. Deploy the application.
+
+Streamlit Community Cloud installs the dashboard dependencies
+and starts the application from the GitHub repository.
+
+### Deployment Validation
+
+The deployed application was verified on November 13, 2026.
+
+- Historical backtest datasets loaded successfully.
+- The dashboard displayed 299 simulated trades and 329 trading days.
+- Final simulated portfolio equity was $125,326.20.
+- Machine learning evaluation metrics and the probability
+  calibration chart rendered successfully.
+
+The cloud dashboard presents committed historical simulation
+results. It does not execute live trades or automatically
+synchronize new local pipeline results.
 
 ---
 
