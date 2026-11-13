@@ -1198,28 +1198,28 @@ synchronize new local pipeline results.
 
 # 8. Monitoring and Operational Observability
 
-## 9.1 Monitoring Objectives
+## 8.1 Monitoring Objectives
 
 MarketPulse AI monitors historical model evaluation, simulated
 trading performance, local pipeline executions, and data freshness.
 The monitoring dashboard supports research transparency and
 operational troubleshooting; it is not a live trading system.
 
-## 9.2 Machine Learning Model Monitoring
+## 8.2 Machine Learning Model Monitoring
 
 The Streamlit dashboard displays ROC AUC, Brier score, baseline
 comparison, and probability calibration. These metrics evaluate
 the historical test period rather than continuously monitoring
 a deployed model. Automated model-drift detection is not implemented.
 
-## 9.3 Financial and Trading Monitoring
+## 8.3 Financial and Trading Monitoring
 
 The dashboard displays simulated portfolio equity, benchmark
 performance, executed trades, drawdowns, trading statistics,
 profit concentration, and strategy robustness. These are
 historical backtest results, not live brokerage transactions.
 
-## 9.4 Pipeline Execution Monitoring
+## 8.4 Pipeline Execution Monitoring
 
 The Windows automation wrapper records structured execution
 history in `logs/pipeline_execution_history.jsonl`.
@@ -1232,7 +1232,7 @@ Execution types distinguish `test` from `production`.
 Production summary metrics exclude simulated test executions.
 The dashboard displays recent execution records in Central Time.
 
-## 9.5 Data Freshness Monitoring
+## 8.5 Data Freshness Monitoring
 
 The dashboard inspects local stock-price, FRED macroeconomic,
 and market-sentiment Parquet files and reports their record
@@ -1243,7 +1243,7 @@ the release date of each underlying economic indicator.
 Freshness thresholds and automatic stale-data alerts have
 not yet been implemented.
 
-## 9.6 Monitoring Validation
+## 8.6 Monitoring Validation
 
 On November 13, 2026, two simulated automation executions
 validated success and failure recording. The success test
@@ -1254,7 +1254,7 @@ The Streamlit monitoring interface was validated locally.
 These tests do not establish that the scheduled production
 pipeline has completed successfully.
 
-## 9.7 Future Live Monitoring Architecture
+## 8.7 Future Live Monitoring Architecture
 
 A future live-monitoring implementation could:
 
@@ -1273,6 +1273,97 @@ automatically synchronize Windows execution logs or local
 Parquet datasets. Automated notifications, live trading,
 and continuous production model monitoring are not implemented.
 
+
+---
+
+## 8.8 Cloud Monitoring Snapshot and Deployment Validation
+
+MarketPulse AI supports a lightweight, published monitoring snapshot
+for Streamlit Community Cloud environments where local pipeline
+datasets and Windows execution logs are unavailable.
+
+### Snapshot Generation
+
+The snapshot generator is located at:
+
+`scripts/generate_monitoring_snapshot.py`
+
+Run it from the project root:
+
+```powershell
+python .\\scripts\\generate_monitoring_snapshot.py
+```
+
+The script reads the local stock-price, FRED macroeconomic, and
+market-sentiment Parquet datasets, together with the local pipeline
+execution history.
+
+It writes a compact JSON snapshot to:
+
+`results/monitoring/monitoring_snapshot.json`
+
+The snapshot includes its UTC generation timestamp, dataset record
+counts, latest observation dates, source-file modification times,
+production execution counts, simulated test counts, and the latest
+production execution summary when available.
+
+Raw market datasets, individual trades, and full execution logs
+are not included in the snapshot.
+
+### Local and Cloud Monitoring Behavior
+
+The Streamlit dashboard prioritizes local Parquet datasets and
+execution history when those files are available.
+
+When local files are unavailable, it reads the published JSON
+snapshot and displays the available monitoring summaries.
+
+The dashboard labels the snapshot with its generation time
+in Central Time and identifies it as a static export.
+
+The snapshot is not automatically refreshed in Streamlit Cloud.
+After local data changes, the generator must be rerun and the
+updated JSON file committed and pushed to GitHub for publication.
+
+### Deployment Validation ? November 13, 2026
+
+The monitoring snapshot was tested using a Docker dashboard
+container without the local `data/` and `logs/` directories.
+
+The Docker test successfully displayed:
+
+| Monitoring Metric | Verified Value |
+|---|---:|
+| Stock Prices | 46,809 records |
+| FRED Macroeconomic | 2,209 records |
+| Market Sentiment | 2,207 records |
+| Production Executions | 0 |
+| Production Successes | 0 |
+| Production Failures | 0 |
+| Simulated Monitoring Tests | 2 |
+
+The public Streamlit Community Cloud deployment was subsequently
+verified to display the same snapshot information.
+
+Public dashboard:
+https://marketpulse-ai-robanc.streamlit.app/
+
+The verified snapshot was generated on November 13, 2026,
+at 3:08 PM Central Time. Its observations extend through
+November 12, 2026.
+
+### Operational Limitations
+
+Cloud monitoring currently reports the latest manually
+published snapshot, not real-time pipeline execution.
+
+The Windows scheduled pipeline does not automatically publish
+updated snapshots to GitHub or cloud storage. A production
+pipeline run has not yet been verified in the monitoring history.
+
+Future enhancements may include automated snapshot publishing,
+persistent cloud monitoring storage, data-freshness thresholds,
+model-drift detection, and failure notifications.
 
 ---
 
