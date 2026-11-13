@@ -158,7 +158,7 @@ This additional source allows MarketPulse AI to incorporate sentiment-based feat
 
 The historical market dataset covers January 2018 through November 2026.
 
-After aligning the market, macroeconomic, and sentiment datasets, the integrated dataset contains approximately 46,221 stock-date observations across 21 instruments, including SPY.
+After aligning the market, macroeconomic, and sentiment datasets, the integrated dataset contains approximately 46,347 stock-date observations across 21 instruments, including SPY.
 
 Data is aligned by trading date and ticker, with market-wide indicators associated with the corresponding daily stock observations.
 
@@ -283,7 +283,7 @@ MarketPulse AI integrates three datasets into a unified analytical dataset:
 
 The datasets are aligned by trading date, with macroeconomic and sentiment observations associated with individual stock records.
 
-The resulting integrated dataset contains approximately 46,221 observations across 21 instruments, including SPY.
+The resulting integrated dataset contains approximately 46,347 observations across 21 instruments, including SPY.
 
 The data preparation workflow includes date alignment, chronological sorting, duplicate checks, missing-value analysis, and validation of engineered features.
 
@@ -668,7 +668,7 @@ The corrected historical backtest produced the following results:
 
 The strategy generated 299 executed trades.
 
-Over the evaluated period, MarketPulse AI exceeded SPY's cumulative return by approximately 2.75 percentage points.
+Over the evaluated period, MarketPulse AI exceeded SPY's cumulative return by approximately 2.74 percentage points.
 
 The strategy also experienced a smaller historical maximum drawdown.
 
@@ -785,8 +785,14 @@ daily return periods.
 | CAGR | 18.96% | 13.75% | 16.95% |
 | Annualized volatility | 10.69% | 11.10% | 12.30% |
 | Sharpe ratio | 1.677 | 1.215 | 1.329 |
-| Maximum drawdown | -5.24% | -6.12% | -8.89% |
+| Maximum drawdown | -5.24% | -6.12% | -8.88% |
 | Positive trading days | 56.71% | 53.66% | 53.05% |
+
+The CAGR values in this three-strategy comparison use calendar-time
+annualization based on elapsed days divided by 365.25. The separate
+backtest performance summary annualizes returns using 252 trading
+days per year, which explains the small differences in reported
+annualized returns.
 
 The Random Forest strategy achieved the highest cumulative return
 and Sharpe ratio and the smallest maximum drawdown over this period.
@@ -1325,7 +1331,7 @@ The snapshot is not automatically refreshed in Streamlit Cloud.
 After local data changes, the generator must be rerun and the
 updated JSON file committed and pushed to GitHub for publication.
 
-### Deployment Validation ? November 13, 2026
+### Deployment Validation - November 13, 2026
 
 The monitoring snapshot was tested using a Docker dashboard
 container without the local `data/` and `logs/` directories.
@@ -1623,13 +1629,13 @@ They do not establish that the strategy will remain profitable in future markets
 
 ## 10.6 Automated Research Workflow
 
-MarketPulse AI extends the notebook-based research process with seven Python pipeline scripts, a centralized orchestrator, and a master workflow notebook.
+MarketPulse AI extends the notebook-based research process with 12 numbered Python pipeline scripts, a shared incremental storage utility, a centralized orchestrator, and a master workflow notebook. The pipeline supports cached, full, and incremental execution modes.
 
 The cached workflow was validated in an isolated project copy and subsequently executed successfully in the primary project directory on November 11, 2026.
 
 An enabled Windows scheduled task is configured to execute the incremental pipeline every Sunday at 6:00 PM Central.
 
-Automation architecture and scheduling details are documented in Section 6, while reproduction instructions are provided in Section 8.
+Automation architecture and scheduling details are documented in Section 6, while reproduction instructions are provided in Section 9.
 
 ## 10.7 Future Enhancements
 
@@ -1668,7 +1674,7 @@ These findings support further research rather than a conclusion that the strate
 | Annualized Return | 18.94% | 16.93% |
 | Annualized Volatility | 10.69% | 12.30% |
 | Sharpe Ratio | 1.68 | 1.33 |
-| Maximum Drawdown | -5.24% | -8.89% |
+| Maximum Drawdown | -5.24% | -8.88% |
 | Positive Day Rate | 56.71% | 53.05% |
 | Trading Days | 328 | 328 |
 
@@ -1869,7 +1875,7 @@ Operational limitations include:
 - Full-mode execution has not yet been validated end to end.
 - Incremental ingestion and checkpoint recovery are implemented; scheduled execution and power-loss recovery remain to be verified.
 - Scheduled execution depends on local computer and Windows session availability.
-- Automated alerting and cloud-based monitoring are not implemented.
+- A static monitoring snapshot is available in the cloud dashboard, but automatic synchronization, live cloud monitoring, and failure notifications are not implemented.
 
 The automation should therefore be treated as a local research workflow rather than a production data platform.
 
