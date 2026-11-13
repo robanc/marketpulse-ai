@@ -1,4 +1,4 @@
-﻿# MarketPulse AI - Streamlit Dashboard
+# MarketPulse AI - Streamlit Dashboard
 
 from pathlib import Path
 
@@ -54,6 +54,7 @@ st.sidebar.markdown("""
 - [Risk Analysis](#portfolio-risk-analysis)
 - [Model Evaluation](#machine-learning-model-evaluation)
 - [Strategy Insights](#strategy-insights)
+- [Operational Monitoring](#operational-monitoring)
 """)
 
 st.sidebar.divider()
@@ -556,3 +557,161 @@ st.caption(
     "| Educational research project — not investment advice."
 )
 
+
+
+# --------------------------------------------------
+# Operational Monitoring - Local Pipeline Execution
+# --------------------------------------------------
+
+st.divider()
+st.header("Operational Monitoring")
+
+
+st.subheader("Data Freshness Monitoring")
+
+data_sources = {
+    "Stock Prices": "stock_prices.parquet",
+    "FRED Macroeconomic": "fred_macro.parquet",
+    "Market Sentiment": "market_sentiment.parquet",
+}
+
+freshness_records = []
+
+for source_name, filename in data_sources.items():
+    data_path = PROJECT_ROOT / "data" / filename
+
+    if data_path.exists():
+        try:
+            source_data = pd.read_parquet(data_path)
+
+            latest_date = (
+                pd.to_datetime(source_data["date"]).max()
+                if "date" in source_data.columns
+                else pd.NaT
+            )
+
+            modified_at = pd.Timestamp(
+                data_path.stat().st_mtime, unit="s", tz="UTC"
+            ).tz_convert("America/Chicago")
+
+            freshness_records.append({
+                "Dataset": source_name,
+                "Records": len(source_data),
+                "Latest Observation": (
+                    latest_date.strftime("%Y-%m-%d")
+                    if pd.notna(latest_date) else "Unknown"
+                ),
+                "File Updated (Central)": modified_at.strftime(
+                    "%Y-%m-%d %I:%M:%S %p %Z"
+                ),
+            })
+        except (OSError, ValueError, KeyError) as exc:
+            st.warning(f"Unable to inspect {source_name}: {exc}")
+    else:
+        freshness_records.append({
+            "Dataset": source_name,
+            "Records": None,
+            "Latest Observation": "Unavailable",
+            "File Updated (Central)": "Unavailable",
+        })
+
+st.dataframe(
+    pd.DataFrame(freshness_records),
+    use_container_width=True,
+    hide_index=True,
+)
+
+st.caption(
+    "Latest observation dates indicate dataset coverage, not "
+    "necessarily the publication date of each underlying indicator. "
+    "Local data files are not automatically available in Streamlit Cloud."
+)
+
+
+st.caption(
+    "Pipeline execution history | Local monitoring"
+)
+
+history_path = PROJECT_ROOT / "logs" / "pipeline_execution_history.jsonl"
+
+if history_path.exists():
+    try:
+        history = pd.read_json(history_path, lines=True, encoding="utf-8-sig")
+
+        if history.empty:
+            st.info("No pipeline execution records are available.")
+        else:
+            history["started_at"] = pd.to_datetime(
+                history["started_at"], utc=True
+            )
+            history["completed_at"] = pd.to_datetime(
+                history["completed_at"], utc=True
+            )
+
+            history = history.sort_values(
+                "started_at", ascending=False
+            )
+
+            for column in ("started_at", "completed_at"):
+                history[column] = (
+                    history[column]
+                    .dt.tz_convert("America/Chicago")
+                    .dt.strftime("%Y-%m-%d %I:%M:%S %p %Z")
+                )
+
+            st.warning(
+                "Current execution history includes simulated "
+                "monitoring tests. These records do not verify "
+                "a successful production pipeline run."
+            )
+
+            production_history = history[
+                history["execution_type"] == "production"
+            ]
+
+            col1, col2, col3 = st.columns(3)
+
+            col1.metric(
+                "Production Executions", len(production_history)
+            )
+            col2.metric(
+                "Production Successes",
+                int((production_history["status"] == "success").sum())
+            )
+            col3.metric(
+                "Production Failures",
+                int((production_history["status"] == "failed").sum())
+            )
+
+            if production_history.empty:
+                st.info(
+                    "No production pipeline executions have been "
+                    "recorded yet. The history below contains "
+                    "monitoring test records."
+                )
+
+            st.subheader("Pipeline Execution History")
+
+            st.dataframe(
+                history[
+                    [
+                        "started_at",
+                        "completed_at",
+                        "duration_seconds",
+                        "status",
+                        "execution_type",
+                        "exit_code",
+                    ]
+                ],
+                use_container_width=True,
+                hide_index=True,
+            )
+
+    except (ValueError, KeyError, OSError) as exc:
+        st.error(f"Unable to load monitoring history: {exc}")
+else:
+    st.info(
+        "Local pipeline execution history is not available "
+        "in this environment. Streamlit Cloud does not "
+        "automatically synchronize Windows pipeline logs."
+    )

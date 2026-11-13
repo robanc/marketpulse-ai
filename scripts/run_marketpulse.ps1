@@ -1,5 +1,8 @@
 $ErrorActionPreference = "Stop"
 
+$executionStartedAt = Get-Date
+$executionTimer = [System.Diagnostics.Stopwatch]::StartNew()
+
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $python = Join-Path $projectRoot ".venv\Scripts\python.exe"
 $pipeline = Join-Path $projectRoot "src\run_pipeline.py"
@@ -59,6 +62,35 @@ finally {
         $mutex.ReleaseMutex()
     }
     $mutex.Dispose()
+
+    $executionTimer.Stop()
+    $executionCompletedAt = Get-Date
+
+    $executionStatus = if ($exitCode -eq 0) {
+        "success"
+    }
+    elseif ($exitCode -eq 2) {
+        "skipped"
+    }
+    else {
+        "failed"
+    }
+
+    $historyFile = Join-Path $logDir "pipeline_execution_history.jsonl"
+
+    $executionRecord = [ordered]@{
+        started_at = $executionStartedAt.ToString("o")
+        completed_at = $executionCompletedAt.ToString("o")
+        duration_seconds = [math]::Round($executionTimer.Elapsed.TotalSeconds, 2)
+        status = $executionStatus
+        execution_type = "production"
+        exit_code = $exitCode
+        log_file = if (Test-Path $logFile) { $logFile } else { $null }
+    }
+
+    $executionRecord |
+        ConvertTo-Json -Compress |
+        Add-Content -Path $historyFile -Encoding utf8
 }
 
 exit $exitCode

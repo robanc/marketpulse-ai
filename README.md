@@ -10,11 +10,12 @@
 5. [Trading Simulation](#5-trading-simulation)
 6. [Automation](#6-automation)
 7. [Docker Containerization and Cloud Deployment](#7-docker-containerization-and-cloud-deployment)
-8. [Reproducibility](#8-reproducibility)
-9. [Advanced Features and Enhancements](#9-advanced-features-and-enhancements)
-10. [Results and Key Findings](#10-results-and-key-findings)
-11. [Limitations and Responsible Use](#11-limitations-and-responsible-use)
-12. [References and Acknowledgments](#12-references-and-acknowledgments)
+8. [Monitoring and Operational Observability](#8-monitoring-and-operational-observability)
+9. [Reproducibility](#9-reproducibility)
+10. [Advanced Features and Enhancements](#10-advanced-features-and-enhancements)
+11. [Results and Key Findings](#11-results-and-key-findings)
+12. [Limitations and Responsible Use](#12-limitations-and-responsible-use)
+13. [References and Acknowledgments](#13-references-and-acknowledgments)
 
 
 
@@ -1192,11 +1193,92 @@ The cloud dashboard presents committed historical simulation
 results. It does not execute live trades or automatically
 synchronize new local pipeline results.
 
+
 ---
 
-# 8. Reproducibility
+# 8. Monitoring and Operational Observability
 
-## 8.1 Reproducibility Objectives
+## 9.1 Monitoring Objectives
+
+MarketPulse AI monitors historical model evaluation, simulated
+trading performance, local pipeline executions, and data freshness.
+The monitoring dashboard supports research transparency and
+operational troubleshooting; it is not a live trading system.
+
+## 9.2 Machine Learning Model Monitoring
+
+The Streamlit dashboard displays ROC AUC, Brier score, baseline
+comparison, and probability calibration. These metrics evaluate
+the historical test period rather than continuously monitoring
+a deployed model. Automated model-drift detection is not implemented.
+
+## 9.3 Financial and Trading Monitoring
+
+The dashboard displays simulated portfolio equity, benchmark
+performance, executed trades, drawdowns, trading statistics,
+profit concentration, and strategy robustness. These are
+historical backtest results, not live brokerage transactions.
+
+## 9.4 Pipeline Execution Monitoring
+
+The Windows automation wrapper records structured execution
+history in `logs/pipeline_execution_history.jsonl`.
+
+Each JSONL record contains execution start and completion times,
+duration in seconds, status, execution type, exit code, and log
+file reference.
+
+Execution types distinguish `test` from `production`.
+Production summary metrics exclude simulated test executions.
+The dashboard displays recent execution records in Central Time.
+
+## 9.5 Data Freshness Monitoring
+
+The dashboard inspects local stock-price, FRED macroeconomic,
+and market-sentiment Parquet files and reports their record
+counts, latest observation dates, and file modification times.
+
+Observation dates indicate dataset coverage, not necessarily
+the release date of each underlying economic indicator.
+Freshness thresholds and automatic stale-data alerts have
+not yet been implemented.
+
+## 9.6 Monitoring Validation
+
+On November 13, 2026, two simulated automation executions
+validated success and failure recording. The success test
+returned exit code 0; the failure test returned exit code 1.
+Both records are classified as `test`.
+
+The Streamlit monitoring interface was validated locally.
+These tests do not establish that the scheduled production
+pipeline has completed successfully.
+
+## 9.7 Future Live Monitoring Architecture
+
+A future live-monitoring implementation could:
+
+1. Run the pipeline on a reliable scheduled compute service.
+2. Publish execution metadata and refreshed datasets to
+   authenticated cloud storage or a monitoring database.
+3. Have the cloud dashboard read those published records.
+4. Monitor model quality, data freshness, pipeline failures,
+   and portfolio risk using source-specific thresholds.
+5. Send alerts through email or Telegram when failures or
+   threshold violations occur.
+6. Track alert delivery, recovery, and operational history.
+
+Currently, the Streamlit Community Cloud dashboard does not
+automatically synchronize Windows execution logs or local
+Parquet datasets. Automated notifications, live trading,
+and continuous production model monitoring are not implemented.
+
+
+---
+
+# 9. Reproducibility
+
+## 9.1 Reproducibility Objectives
 
 MarketPulse AI is structured to support repeatable data processing, machine learning, historical backtesting, and strategy analysis.
 
@@ -1204,7 +1286,7 @@ The project provides Jupyter notebooks, exported Python scripts, a pipeline orch
 
 The objective is to allow another developer to reproduce the analytical workflow and evaluate its assumptions and limitations.
 
-## 8.2 System Requirements
+## 9.2 System Requirements
 
 The project was developed using:
 
@@ -1218,7 +1300,7 @@ Major Python libraries include pandas, NumPy, scikit-learn, XGBoost, yfinance, s
 
 The project dependencies are recorded in `requirements.txt`.
 
-## 8.3 Clone and Set Up the Environment
+## 9.3 Clone and Set Up the Environment
 
 Clone the repository:
 
@@ -1242,7 +1324,7 @@ python -m pip install -r requirements.txt
 
 All subsequent commands should be executed from the project root.
 
-## 8.4 Data Preparation and Storage
+## 9.4 Data Preparation and Storage
 
 MarketPulse AI uses three principal data sources:
 
@@ -1264,7 +1346,7 @@ Therefore, a fresh repository clone requires the datasets to be obtained or rege
 
 Data collection can be attempted using the full pipeline, subject to external source availability and the current full-mode validation limitations.
 
-## 8.5 Running the Pipeline
+## 9.5 Running the Pipeline
 
 To preview execution:
 
@@ -1288,7 +1370,7 @@ The cached pipeline requires the previously generated datasets and supporting pr
 
 Full mode is intended to regenerate source datasets, but has not yet been validated end to end.
 
-## 8.6 Reproducing the Modeling Workflow
+## 9.6 Reproducing the Modeling Workflow
 
 The modeling workflow includes:
 
@@ -1304,7 +1386,7 @@ The modeling methodology and results are documented in Section 4.
 
 Exact numerical reproduction may depend on package versions, data revisions, and external source availability.
 
-## 8.7 Reproducing the Trading Simulation
+## 9.7 Reproducing the Trading Simulation
 
 The trading simulation uses model-generated probabilities, defined trading rules, portfolio allocation assumptions, and transaction cost modeling.
 
@@ -1323,7 +1405,7 @@ The verified historical simulation produced:
 
 These are historical simulation results, not guarantees of future performance.
 
-## 8.8 Reproducibility Validation
+## 9.8 Reproducibility Validation
 
 On November 11, 2026, the updated cached pipeline completed successfully in the primary project directory.
 
@@ -1344,7 +1426,7 @@ This confirms reproducibility of both strategy equity curves using the available
 
 It does not establish that a fresh clone can reproduce every result without additional data preparation or that full-mode execution will succeed under all external data conditions.
 
-## 8.9 Known Limitations
+## 9.9 Known Limitations
 
 Reproducibility is subject to several constraints:
 
@@ -1358,9 +1440,9 @@ Reproducibility is subject to several constraints:
 
 ---
 
-# 9. Advanced Features and Enhancements
+# 10. Advanced Features and Enhancements
 
-## 9.1 Interactive Streamlit Dashboard
+## 10.1 Interactive Streamlit Dashboard
 
 MarketPulse AI includes an interactive analytical dashboard implemented in `app/streamlit_app.py`.
 
@@ -1384,7 +1466,7 @@ streamlit run .\\app\\streamlit_app.py
 
 The dashboard is designed to communicate historical research findings rather than execute live trades.
 
-## 9.2 Multi-Source Market Data Integration
+## 10.2 Multi-Source Market Data Integration
 
 MarketPulse AI integrates three complementary information sources:
 
@@ -1396,7 +1478,7 @@ Combining these sources supports analysis of technical, macroeconomic, and senti
 
 The underlying data preparation methodology is documented in Sections 2 and 3.
 
-## 9.3 Machine Learning Model Evaluation
+## 10.3 Machine Learning Model Evaluation
 
 The project includes classification and regression model comparison outputs, together with Random Forest hyperparameter tuning results.
 
@@ -1406,7 +1488,7 @@ The Streamlit application includes a dedicated machine learning evaluation secti
 
 Model selection and evaluation details are documented in Section 4.
 
-## 9.4 Portfolio Risk and Trading Analytics
+## 10.4 Portfolio Risk and Trading Analytics
 
 Beyond total returns, MarketPulse AI evaluates portfolio risk and trading behavior.
 
@@ -1422,7 +1504,7 @@ The project generates analytical outputs covering:
 
 These analyses provide additional context for interpreting simulated investment performance.
 
-## 9.5 Strategy Robustness and Explainability
+## 10.5 Strategy Robustness and Explainability
 
 The strategy-analysis pipeline generates 13 CSV artifacts under `results/strategy_analysis/`.
 
@@ -1448,7 +1530,7 @@ These outputs help assess whether simulated results are concentrated in particul
 
 They do not establish that the strategy will remain profitable in future markets.
 
-## 9.6 Automated Research Workflow
+## 10.6 Automated Research Workflow
 
 MarketPulse AI extends the notebook-based research process with seven Python pipeline scripts, a centralized orchestrator, and a master workflow notebook.
 
@@ -1458,7 +1540,7 @@ An enabled Windows scheduled task is configured to execute the incremental pipel
 
 Automation architecture and scheduling details are documented in Section 6, while reproduction instructions are provided in Section 8.
 
-## 9.7 Future Enhancements
+## 10.7 Future Enhancements
 
 Potential improvements include:
 
@@ -1475,9 +1557,9 @@ These items are proposed enhancements and are not presented as completed functio
 
 ---
 
-# 10. Results and Key Findings
+# 11. Results and Key Findings
 
-## 10.1 Executive Results Summary
+## 11.1 Executive Results Summary
 
 MarketPulse AI combines historical market data, machine learning, and a simulated trading strategy to evaluate risk-adjusted investment performance.
 
@@ -1487,7 +1569,7 @@ Although the simulated portfolio showed favorable risk-adjusted performance, pre
 
 These findings support further research rather than a conclusion that the strategy has a reliable predictive advantage.
 
-## 10.2 Portfolio Performance Comparison
+## 11.2 Portfolio Performance Comparison
 
 | Metric | MarketPulse AI | SPY Buy & Hold |
 |---|---:|---:|
@@ -1505,7 +1587,7 @@ Its lower annualized volatility and smaller maximum drawdown contributed to a hi
 
 These comparisons depend on the backtest assumptions and should not be interpreted as live trading performance.
 
-## 10.3 Machine Learning Model Comparison
+## 11.3 Machine Learning Model Comparison
 
 The classification model comparison produced the following results:
 
@@ -1524,7 +1606,7 @@ These results indicate weak out-of-sample predictive discrimination and limited 
 
 The model comparison and final test evaluation represent different evaluation outputs and should not be treated as interchangeable.
 
-## 10.4 Trading Performance
+## 11.4 Trading Performance
 
 The historical trading simulation generated the following results:
 
@@ -1544,7 +1626,7 @@ The profit factor above 1.0 indicates that aggregate simulated winning-trade pro
 
 The modest win rate and substantial dispersion between the best and worst trades highlight the importance of risk management.
 
-## 10.5 Benchmark Risk Analysis
+## 11.5 Benchmark Risk Analysis
 
 The benchmark-relative analysis produced:
 
@@ -1562,7 +1644,7 @@ The portfolio beta below 1.0 indicates lower measured sensitivity to SPY over th
 
 The positive but relatively small information ratio suggests that benchmark-relative excess return was modest relative to tracking error.
 
-## 10.6 Strategy Robustness and Profit Concentration
+## 11.6 Strategy Robustness and Profit Concentration
 
 The strategy robustness analysis identified several important findings:
 
@@ -1577,7 +1659,7 @@ High profit concentration means that a small number of trades contributed dispro
 
 This raises concerns about the stability and repeatability of simulated outperformance.
 
-## 10.7 Key Findings
+## 11.7 Key Findings
 
 The project produced five principal findings:
 
@@ -1587,7 +1669,7 @@ The project produced five principal findings:
 4. Trading profitability was highly concentrated in a small number of executions.
 5. Historical backtest performance alone is insufficient to establish a robust or deployable investment strategy.
 
-## 10.8 Final Assessment
+## 11.8 Final Assessment
 
 MarketPulse AI demonstrates an end-to-end analytical workflow integrating market data engineering, machine learning, trading simulation, risk evaluation, strategy analysis, and dashboard visualization.
 
@@ -1600,9 +1682,9 @@ Further validation, stronger probability calibration, more realistic execution a
 
 ---
 
-# 11. Limitations and Responsible Use
+# 12. Limitations and Responsible Use
 
-## 11.1 Research Scope and Intended Use
+## 12.1 Research Scope and Intended Use
 
 MarketPulse AI is an educational research project developed for the Stock Markets Analytics Zoomcamp 2026 capstone.
 
@@ -1612,7 +1694,7 @@ The system is intended for research, learning, and analytical evaluation.
 
 It is not a live trading platform, investment advisory service, or production-ready portfolio management system.
 
-## 11.2 Predictive Model Limitations
+## 12.2 Predictive Model Limitations
 
 The final model demonstrated weak out-of-sample predictive performance.
 
@@ -1630,7 +1712,7 @@ The Brier score being worse than the constant baseline indicates that the model'
 
 Consequently, the available results do not establish a reliable predictive advantage.
 
-## 11.3 Historical Data Limitations
+## 12.3 Historical Data Limitations
 
 The project relies on historical market data from Yahoo Finance, FRED, and the CNN Fear & Greed Index.
 
@@ -1645,7 +1727,7 @@ Potential limitations include:
 
 Historical feature availability must be considered carefully to avoid introducing information that would not have been known at the time of a simulated decision.
 
-## 11.4 Backtesting Assumptions
+## 12.4 Backtesting Assumptions
 
 The trading simulation uses historical prices and defined portfolio execution rules.
 
@@ -1662,7 +1744,7 @@ Important limitations include:
 
 These assumptions can materially affect realized investment performance.
 
-## 11.5 Profit Concentration and Strategy Stability
+## 12.5 Profit Concentration and Strategy Stability
 
 The strategy generated 299 simulated trades with a win rate of approximately 51.84%.
 
@@ -1674,7 +1756,7 @@ A strategy with concentrated profits may be sensitive to changes in market condi
 
 Additional robustness testing is necessary before drawing conclusions about repeatability.
 
-## 11.6 Benchmark Comparison Limitations
+## 12.6 Benchmark Comparison Limitations
 
 MarketPulse AI compares its simulated portfolio against SPY buy-and-hold.
 
@@ -1684,7 +1766,7 @@ However, the comparison is affected by differences in exposure, trading activity
 
 A favorable historical benchmark comparison does not establish superior future performance.
 
-## 11.7 Automation and Operational Limitations
+## 12.7 Automation and Operational Limitations
 
 The project includes a Python orchestrator and a registered Windows scheduled task.
 
@@ -1700,7 +1782,7 @@ Operational limitations include:
 
 The automation should therefore be treated as a local research workflow rather than a production data platform.
 
-## 11.8 Responsible Interpretation of Results
+## 12.8 Responsible Interpretation of Results
 
 MarketPulse AI results should be interpreted as historical simulation outputs.
 
@@ -1714,7 +1796,7 @@ Users should not assume that:
 
 Financial decisions require consideration of individual objectives, risk tolerance, liquidity needs, and independent due diligence.
 
-## 11.9 Future Validation Requirements
+## 12.9 Future Validation Requirements
 
 Before considering real-world deployment, additional work would be necessary.
 
@@ -1729,7 +1811,7 @@ Recommended validation includes:
 7. Implementing monitoring, error notifications, and operational safeguards.
 8. Conducting paper trading before any consideration of live execution.
 
-## 11.10 Disclaimer
+## 12.10 Disclaimer
 
 MarketPulse AI is provided for educational and research purposes only.
 
@@ -1742,9 +1824,9 @@ Past performance does not guarantee future results.
 
 ---
 
-# 12. References and Acknowledgments
+# 13. References and Acknowledgments
 
-## 12.1 Educational Program
+## 13.1 Educational Program
 
 MarketPulse AI was developed as a capstone project for the Stock Markets Analytics Zoomcamp 2026.
 
@@ -1754,7 +1836,7 @@ Educational resource:
 
 - [DataTalks.Club](https://datatalks.club/)
 
-## 12.2 Financial Data Sources
+## 13.2 Financial Data Sources
 
 The project uses the following financial data providers and resources:
 
@@ -1766,7 +1848,7 @@ The project uses the following financial data providers and resources:
 
 Historical market data may be revised, and provider access or data formats may change over time.
 
-## 12.3 Python Libraries and Frameworks
+## 13.3 Python Libraries and Frameworks
 
 Major technologies used in the project include:
 
@@ -1786,7 +1868,7 @@ Major technologies used in the project include:
 
 The complete Python dependency specification is maintained in `requirements.txt`.
 
-## 12.4 Project Repository
+## 13.4 Project Repository
 
 Source code, notebooks, exported pipeline scripts, and project documentation are maintained in the GitHub repository:
 
@@ -1794,13 +1876,13 @@ https://github.com/robanc/marketpulse-ai
 
 The repository includes the implementation of the data processing, modeling, backtesting, analysis, dashboard, and local automation workflows.
 
-## 12.5 Acknowledgments
+## 13.5 Acknowledgments
 
 Acknowledgment is given to DataTalks.Club and the Stock Markets Analytics Zoomcamp learning community for providing the educational framework and project guidance.
 
 The project also benefits from the open-source Python ecosystem and publicly accessible financial data resources used throughout the analytical workflow.
 
-## 12.6 Research and Financial Disclaimer
+## 13.6 Research and Financial Disclaimer
 
 References to external data providers, software libraries, and educational resources are provided for attribution and reproducibility.
 
