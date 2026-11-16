@@ -99,22 +99,10 @@ def main():
     existing = pd.read_parquet(STOCK_FILE)
     incoming = fetch_incremental(existing, args.overlap_days)
 
-    # Preserve historical records; append only previously unseen keys.
-    existing_keys = pd.MultiIndex.from_frame(
-        existing[["ticker", "date"]].assign(
-            date=pd.to_datetime(existing["date"])
-        )
-    )
-    incoming_keys = pd.MultiIndex.from_frame(
-        incoming[["ticker", "date"]].assign(
-            date=pd.to_datetime(incoming["date"])
-        )
-    )
-
-    new_only = incoming.loc[~incoming_keys.isin(existing_keys)].copy()
-
+    # Refresh overlapping dates while preserving older historical records.
+    # Incoming downloaded records take precedence for matching ticker/date keys.
     merged = merge_incremental(
-        existing, new_only, ["ticker", "date"]
+        existing, incoming, ["ticker", "date"]
     )
 
     expected = set(existing["ticker"].unique())
