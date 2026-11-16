@@ -16,6 +16,7 @@
 11. [Results and Key Findings](#11-results-and-key-findings)
 12. [Limitations and Responsible Use](#12-limitations-and-responsible-use)
 13. [References and Acknowledgments](#13-references-and-acknowledgments)
+14. [Alpaca Broker API Integration](#14-alpaca-broker-api-integration)
 
 
 
@@ -1986,3 +1987,73 @@ References to external data providers, software libraries, and educational resou
 Their inclusion does not imply endorsement of MarketPulse AI or its simulated trading results.
 
 MarketPulse AI is an educational research project and does not provide financial advice or guarantees of investment performance.
+
+
+---
+
+# 14. Alpaca Broker API Integration
+
+## 14.1 Overview
+
+MarketPulse AI includes a research-only integration with the Alpaca paper-trading API.
+
+The integration demonstrates how machine learning predictions can be validated, translated into proposed stock orders, and checked against brokerage account information.
+
+Actual brokerage order submission is intentionally disabled.
+
+## 14.2 Implementation
+
+The broker integration consists of three modules:
+
+- `src/broker/alpaca_paper.py` — Paper-account connection, account summary, and open-order retrieval.
+- `src/broker/order_preview.py` — Prediction validation, cash-limited order previews, and existing-exposure filtering.
+- `src/broker/paper_execution.py` — Paper-order input validation and disabled-by-default execution interface.
+
+## 14.3 Safety Controls
+
+The integration implements the following safeguards:
+
+1. Requires `ALPACA_PAPER=true` in the local configuration.
+2. Creates Alpaca clients with `paper=True`.
+3. Keeps API credentials outside the Git repository.
+4. Rejects stale, future-dated, duplicate, or malformed prediction signals.
+5. Rejects same-day predictions when the market session is identified as incomplete.
+6. Limits proposed purchases to a maximum of 10% of available cash.
+7. Excludes tickers already held or associated with open orders when the exposure filter is applied.
+8. Rejects invalid order quantities, prices, tickers, and duplicate proposed orders.
+9. Disables order submission regardless of the confirmation argument.
+
+The safeguards operate across separate validation and preview functions. They do not constitute a fully integrated automated order-execution workflow.
+
+## 14.4 Automated Testing
+
+Broker-related tests are located in:
+
+- `tests/test_alpaca_paper.py`
+- `tests/test_order_preview.py`
+- `tests/test_paper_execution.py`
+
+The complete project test suite passed on November 16, 2026:
+
+- 48 tests passed.
+- Zero test failures.
+
+Tests use mocked brokerage clients where appropriate and do not submit orders.
+
+To run the full test suite:
+
+```powershell
+python -m pytest tests -q
+```
+
+## 14.5 Current Limitations
+
+The Alpaca integration is intended for educational research and paper-order preparation.
+
+- Actual paper-order submission is disabled.
+- No live-money trading is implemented.
+- Proposed order costs use reference prices rather than guaranteed execution prices.
+- Account status, available cash, and existing exposure must be revalidated before any future execution capability is enabled.
+- Additional safeguards, explicit authorization, order reconciliation, and execution monitoring would be required for a complete paper-trading workflow.
+
+The historical backtesting results reported elsewhere in this project are simulated and are not Alpaca brokerage performance.
