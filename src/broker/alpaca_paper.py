@@ -55,3 +55,12 @@ def get_paper_account_summary(env_path=".env"):
         "buying_power": float(account.buying_power),
         "trading_blocked": account.trading_blocked,
     }
+
+
+def get_open_paper_orders(client):
+    """Retrieve only open paper orders; never submit or cancel orders."""
+    from alpaca.trading.enums import QueryOrderStatus
+    from alpaca.trading.requests import GetOrdersRequest
+
+    request = GetOrdersRequest(status=QueryOrderStatus.OPEN)
+    return client.get_orders(filter=request)

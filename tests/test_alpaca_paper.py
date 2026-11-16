@@ -67,3 +67,22 @@ def test_trading_client_always_uses_paper_mode(tmp_path, monkeypatch):
         secret_key="dummy_secret",
         paper=True,
     )
+
+
+def test_get_open_paper_orders_requests_open_status():
+    """Verify the broker queries only open orders."""
+    from unittest.mock import MagicMock
+
+    from alpaca.trading.enums import QueryOrderStatus
+    from src.broker.alpaca_paper import get_open_paper_orders
+
+    mock_client = MagicMock()
+    mock_client.get_orders.return_value = []
+
+    result = get_open_paper_orders(mock_client)
+
+    assert result == []
+    mock_client.get_orders.assert_called_once()
+
+    request = mock_client.get_orders.call_args.kwargs["filter"]
+    assert request.status == QueryOrderStatus.OPEN
